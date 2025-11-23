@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  publicId  String   @unique @default("CORP")
+  orders    Order[]
+  users     User[]
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  googleId      String?        @unique
+  name          String?
+  picture       String?
+  email         String         @unique
+  password      String?
+  role          Role           @default(COLLABORATOR)
+  function      String?
+  user_type     String[]       @default(["Pending"])
+  features      String[]       @default(["Encarregado"])
+  access        String         @default("default")
+  companyId     Int
+  status        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  createdOrders Order[]        @relation("colaborador")
+  updatedOrders Order[]        @relation("updatedBy")
+  refreshTokens RefreshToken[]
+  company       Company        @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}
+
+model Order {
+  id                   Int         @id @default(autoincrement())
+  placa                String
+  status               OrderStatus @default(Em_Andamento)
+  fotos_antes          String[]
+  fotos_depois         String[]
+  titulo               String
+  descricao            String
+  valor_cobrado_amount Float
+  data_inicio          DateTime
+  oficina_id           String
+  colaborador_id       Int
+  pecas_usadas         String[]
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  updated_by           Int
+  colaborador          User        @relation("colaborador", fields: [colaborador_id], references: [id])
+  company              Company     @relation(fields: [oficina_id], references: [publicId])
+  updatedByUser        User        @relation("updatedBy", fields: [updated_by], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+enum OrderStatus {
+  Em_Andamento
+  Concluido
+  Cancelado
+  Aguardando_Pecas
+  Aguardando_Aprovacao
+}
+
+enum Role {
+  OWNER
+  COLLABORATOR
+}

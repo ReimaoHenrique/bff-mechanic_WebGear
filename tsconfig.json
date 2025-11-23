@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+
+    "module": "NodeNext",
+
+    "moduleResolution": "NodeNext",
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Interop com CommonJS (pra usar libs como express)
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Performance e segurança
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Types do Node.js
+    "types": ["node"],
+
+    // Libs: Inclui APIs modernas do JS (opcional, mas útil)
+    "lib": ["ES2023", "ES2023.Array"]
+  },
+
+  // Inclui apenas o código-fonte
+  "include": ["src/**/*"],
+
+  // Exclui node_modules
+  "exclude": ["node_modules", "dist"]
+}
