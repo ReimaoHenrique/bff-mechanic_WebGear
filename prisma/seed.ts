@@ -7,14 +7,16 @@ async function main() {
   console.log("🌱 Iniciando o seed...");
 
   // Cria as empresas (oficinas)
-  const companies = await prisma.company.createMany({
-    data: [
-      { name: "Oficina Turbo", createdBy: 1 },
-      { name: "AutoMec Reimão", createdBy: 1 },
-      { name: "PitStop Express", createdBy: 2 },
-    ],
+  const oficinaTurbo = await prisma.company.create({
+    data: { name: "Oficina Turbo" },
   });
-  console.log(`🏢 Criadas ${companies.count} empresas`);
+  const autoMec = await prisma.company.create({
+    data: { name: "AutoMec Reimão" },
+  });
+  const pitStop = await prisma.company.create({
+    data: { name: "PitStop Express" },
+  });
+  console.log("🏢 Criadas 3 empresas");
 
   // Cria os usuários principais (donos)
   const owner1 = await prisma.user.create({
@@ -25,7 +27,7 @@ async function main() {
       role: "OWNER",
       function: "Gerente Técnico",
       features: ["Gestão", "Análise de Diagnóstico"],
-      companyId: 1,
+      companyId: oficinaTurbo.id,
     },
   });
 
@@ -37,11 +39,24 @@ async function main() {
       role: "OWNER",
       function: "Supervisor de Oficina",
       features: ["Gestão de equipe", "Controle de estoque"],
-      companyId: 2,
+      companyId: autoMec.id,
     },
   });
 
   console.log(`👑 Criados donos: ${owner1.name}, ${owner2.name}`);
+
+  await prisma.company.update({
+    where: { id: oficinaTurbo.id },
+    data: { createdBy: owner1.id },
+  });
+  await prisma.company.update({
+    where: { id: autoMec.id },
+    data: { createdBy: owner1.id },
+  });
+  await prisma.company.update({
+    where: { id: pitStop.id },
+    data: { createdBy: owner2.id },
+  });
 
   // Cria colaboradores vinculados
   const collaborators = await prisma.user.createMany({
@@ -52,7 +67,7 @@ async function main() {
         password: "123456",
         role: "COLLABORATOR",
         function: "Troca de óleo",
-        companyId: 1,
+        companyId: oficinaTurbo.id,
       },
       {
         name: "Nina Torque",
@@ -60,7 +75,7 @@ async function main() {
         password: "123456",
         role: "COLLABORATOR",
         function: "Diagnóstico elétrico",
-        companyId: 1,
+        companyId: oficinaTurbo.id,
       },
       {
         name: "Beto Chave",
@@ -68,7 +83,7 @@ async function main() {
         password: "123456",
         role: "COLLABORATOR",
         function: "Funilaria e pintura",
-        companyId: 2,
+        companyId: autoMec.id,
       },
     ],
   });
